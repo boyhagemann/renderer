@@ -4,7 +4,7 @@ import { flatten } from '../helpers'
 
 const Element = (node, state, dispatch) => {
 
-  const {_id, type, content} = node
+  const {_id, element, content = []} = node
 
   const events = node.events
     .map(id => Node(id, state, dispatch))
@@ -24,13 +24,40 @@ const Element = (node, state, dispatch) => {
   /**
    * Start building the html attributes
    */
-  let attributes = { key: key, onClick: e => {
+  let attributes = {
+    key: key,
+    onClick: e => {
 
       e.preventDefault()
 
       events
       .filter(event => event.on === 'click')
-      .map(event => event.actions.map(action => dispatch(action.type, action.payload)))
+      .map(event => event.actions.map(action => {
+        action.payload.push(e.target)
+        dispatch(action.type, action.payload)
+      }))
+    },
+    onChange: e => {
+
+      e.preventDefault()
+
+      events
+      .filter(event => event.on === 'change')
+      .map(event => event.actions.map(action => {
+        action.payload.push(e.target)
+        dispatch(action.type, action.payload)
+      }))
+    },
+    onBlur: e => {
+
+      e.preventDefault()
+
+      events
+      .filter(event => event.on === 'blur')
+      .map(event => event.actions.map(action => {
+        action.payload.push(e.target)
+        dispatch(action.type, action.payload)
+      }))
     }
   }
 
@@ -46,16 +73,20 @@ const Element = (node, state, dispatch) => {
       case '_type':
       case '_node':
       case 'events':
-      // case 'styles':
-        break;
+      case 'element':
+        break
+
+      case 'value':
+        attributes.value = node[key] || ''
+        break
 
       case 'styles':
         attributes.style = styles
-        break;
+        break
 
       case 'class':
         attributes.className = node[key]
-        break;
+        break
 
       default:
         attributes[key] = node[key]
@@ -63,9 +94,11 @@ const Element = (node, state, dispatch) => {
   })
 
   return React.createElement(
-    type,
+    element,
     attributes,
-    content.map( id => Node(id, state, dispatch) )
+    content.length
+      ? content.map( id => Node(id, state, dispatch) )
+      : null
   )
 }
 

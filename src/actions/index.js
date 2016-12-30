@@ -1,7 +1,10 @@
 
-export const REQUEST_STRUCTURE = 'REQUEST_STRUCTURE'
-export const RECEIVE_STRUCTURE = 'RECEIVE_STRUCTURE'
-export const FAILED_STRUCTURE = 'FAILED_STRUCTURE'
+
+/**
+ *
+ * Location
+ *
+ */
 
 export const INIT_LOCATION = 'INIT_LOCATION'
 export const CHANGE_LOCATION = 'CHANGE_LOCATION'
@@ -10,15 +13,23 @@ import createHistory from 'history/createBrowserHistory'
 const history = createHistory()
 
 
-
 export const initLocation = () => changeLocation(history.location.pathname)
 
 export function changeLocation(path) {
-
   history.push(path)
-
   return { type: CHANGE_LOCATION, path }
 }
+
+
+
+/**
+ *
+ * Structure
+ *
+ */
+export const REQUEST_STRUCTURE = 'REQUEST_STRUCTURE'
+export const RECEIVE_STRUCTURE = 'RECEIVE_STRUCTURE'
+export const FAILED_STRUCTURE = 'FAILED_STRUCTURE'
 
 const requestStructure = id => ({ type: REQUEST_STRUCTURE, id })
 const failedStructure = (id, code, message) => ({ type: FAILED_STRUCTURE, id, code, message })
@@ -46,9 +57,8 @@ export function fetchStructure(id) {
     })
     .then(function(json) {
       dispatch(receiveStructure(id, json))
-    })
-    .then(function(json) {
-      dispatch(queryData(id, json))
+      dispatch(initArguments(json))
+      dispatch(fetchData())
     })
     // .catch(function(error) {
     //     dispatch(failedStructure(id, 500, error))
@@ -58,6 +68,46 @@ export function fetchStructure(id) {
 }
 
 
+/**
+ *
+ * Query
+ *
+ */
+export const SET_ARGUMENTS = 'SET_ARGUMENTS'
+export const SET_ARGUMENT = 'SET_ARGUMENT'
+
+export function initArguments(json) {
+
+   const defaults = json
+     .filter( node => node._type === 'Argument')
+     .reduce( (current, next) => ({[next.name]: next.default}), {})
+
+   return {
+     type: SET_ARGUMENTS,
+     defaults
+   }
+ }
+
+export function setArgument(from, name, source) {
+
+  const value = source[from]
+
+  return {
+    type: SET_ARGUMENT,
+    name,
+    value
+  }
+
+}
+
+/**
+ *
+ * Data
+ *
+ */
+
+export const RECEIVE_DATA = 'RECEIVE_DATA'
+export const QUERY_DATA   = 'QUERY_DATA'
 
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
 import gql from 'graphql-tag'
@@ -65,26 +115,23 @@ const client = new ApolloClient({
   networkInterface: createNetworkInterface({ uri: 'http://api.komparu.dev/graphql' }),
 });
 
-function receiveData(data) {
+const receiveData = data => ({type: RECEIVE_DATA, data})
 
-  return {
-    type: 'RECEIVE_DATA',
-    data
-  }
-}
+export function fetchData() {
 
-
-export function queryData(id, json) {
-
-  return dispatch => {
-
-          // console.log('start query')
+  return (dispatch, getState) => {
 
       client.query({
-        query: gql`query { products { __id, title }}`
+        query: gql`
+          query  ($limit: Int) {
+            products (limit: $limit) {
+              __id
+              title
+            }
+          }`,
+        variables: getState().query
       })
       .then(result => {
-            // console.log('received', result)
         dispatch(receiveData(result.data))
       })
 
@@ -95,12 +142,18 @@ export function queryData(id, json) {
 
 
 
-
+/**
+ *
+ * Helper function
+ *
+ */
 
 function callFunction(name) {
 
   switch(name) {
     case 'changeLocation': return changeLocation
+    case 'setArgument': return setArgument
+    case 'fetchData': return fetchData
 
     default:
       return

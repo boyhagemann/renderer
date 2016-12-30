@@ -14,14 +14,13 @@ const store = createStore(
   reducer,
   compose(
     applyMiddleware(
-      // client.middleware(),
       thunkMiddleware
     ),
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
   )
 );
 
-store.dispatch(fetchStructure('p827f99313f52b8e17559a60e5cbf08c'))
+store.dispatch(fetchStructure('xd60b2f121f16210045c8a4a00849bdc'))
 store.dispatch(initLocation())
 
 

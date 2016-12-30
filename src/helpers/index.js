@@ -9,7 +9,6 @@ export function arrayToObject(array, key) {
   return object
 }
 
-
 export function replace(object, values) {
 
   const pattern = /"{{[\w\.]+}}"/gi
@@ -25,7 +24,7 @@ export function replace(object, values) {
       .fromJS(values)
       .getIn(key.split('.'))
 
-      if(value) {
+      if(typeof value !== 'undefined') {
 
         // if(typeof(value) === 'string') {
         //   string = string.replace(match, value)

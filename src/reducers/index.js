@@ -1,6 +1,14 @@
 
 import { combineReducers } from 'redux'
-import { REQUEST_STRUCTURE, RECEIVE_STRUCTURE, FAILED_STRUCTURE, CHANGE_LOCATION } from '../actions'
+import {
+  REQUEST_STRUCTURE,
+  RECEIVE_STRUCTURE,
+  FAILED_STRUCTURE,
+  CHANGE_LOCATION,
+  RECEIVE_DATA,
+  SET_ARGUMENTS,
+  SET_ARGUMENT,
+} from '../actions'
 import { arrayToObject } from '../helpers'
 
 
@@ -52,13 +60,27 @@ function structure(state = {}, action) {
 
 }
 
+function query(state = {}, action)
+{
+  switch(action.type) {
+
+    case SET_ARGUMENTS:
+      return Object.assign({}, state, action.defaults)
+
+    case SET_ARGUMENT:
+      return Object.assign({}, state, {[action.name]: action.value})
+
+    default:
+      return state
+  }
+}
 
 
 function data(state = {}, action)
 {
   switch(action.type) {
 
-    case 'RECEIVE_DATA':
+    case RECEIVE_DATA:
       return Object.assign({}, state, {...action.data})
 
     default:
@@ -71,6 +93,7 @@ function data(state = {}, action)
 const reducer = combineReducers({
   location,
   structure,
+  query,
   data,
 })
 
