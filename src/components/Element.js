@@ -32,7 +32,7 @@ const Element = (node, state, dispatch) => {
 
       events
       .filter(event => event.on === 'click')
-      .map(event => event.actions.map(action => {
+      .forEach(event => event.actions.forEach(action => {
         action.payload.push(e.target)
         dispatch(action.type, action.payload)
       }))
@@ -43,7 +43,7 @@ const Element = (node, state, dispatch) => {
 
       events
       .filter(event => event.on === 'change')
-      .map(event => event.actions.map(action => {
+      .forEach(event => event.actions.forEach(action => {
         action.payload.push(e.target)
         dispatch(action.type, action.payload)
       }))
@@ -54,7 +54,7 @@ const Element = (node, state, dispatch) => {
 
       events
       .filter(event => event.on === 'blur')
-      .map(event => event.actions.map(action => {
+      .forEach(event => event.actions.forEach(action => {
         action.payload.push(e.target)
         dispatch(action.type, action.payload)
       }))
