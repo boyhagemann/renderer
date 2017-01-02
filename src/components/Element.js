@@ -1,6 +1,6 @@
 import React from 'react'
 import Node from './Node'
-import { flatten } from '../helpers'
+import { flatten, buildEvents } from '../helpers'
 
 const Element = (node, state, dispatch) => {
 
@@ -20,46 +20,12 @@ const Element = (node, state, dispatch) => {
   // a unique value for the key.
   const key = _id + state.key
 
+  const eventAttributes = buildEvents(events, dispatch)
 
   /**
    * Start building the html attributes
    */
-  let attributes = {
-    key: key,
-    onClick: e => {
-
-      e.preventDefault()
-
-      events
-      .filter(event => event.on === 'click')
-      .forEach(event => event.actions.forEach(action => {
-        action.payload.push(e.target)
-        dispatch(action.type, action.payload)
-      }))
-    },
-    onChange: e => {
-
-      e.preventDefault()
-
-      events
-      .filter(event => event.on === 'change')
-      .forEach(event => event.actions.forEach(action => {
-        action.payload.push(e.target)
-        dispatch(action.type, action.payload)
-      }))
-    },
-    onBlur: e => {
-
-      e.preventDefault()
-
-      events
-      .filter(event => event.on === 'blur')
-      .forEach(event => event.actions.forEach(action => {
-        action.payload.push(e.target)
-        dispatch(action.type, action.payload)
-      }))
-    }
-  }
+  let attributes = Object.assign({key}, eventAttributes)
 
 
   /**

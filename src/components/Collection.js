@@ -4,11 +4,13 @@ import { flatten } from '../helpers'
 
 const Context = (node, state, dispatch) => {
 
-  const data = Immutable
-    .fromJS(state)
-    .getIn(node.source.split('.'))
+  const source = node.source
 
-  if(!data) return
+  if(!source) return
+
+  const json = typeof source === 'string' ? JSON.parse(source) : false
+
+  const data = json || source
 
   return flatten(
 

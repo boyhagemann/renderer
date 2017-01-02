@@ -24,16 +24,10 @@ export function replace(object, values) {
       .fromJS(values)
       .getIn(key.split('.'))
 
-      if(typeof value !== 'undefined') {
+    // Always replace the original placeholder
+    const replace = typeof value !== 'undefined' ? value : null
 
-        // if(typeof(value) === 'string') {
-        //   string = string.replace(match, value)
-        // }
-        // else {
-          string = string.replace(match, JSON.stringify(value))
-        // }
-
-      }
+    string = string.replace(match, JSON.stringify(replace))
   })
 
   return JSON.parse(string)
@@ -43,3 +37,32 @@ export function replace(object, values) {
 export const flatten = list => list.reduce(
     (a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []
 );
+
+
+export const buildEventCallback = (events, type, dispatch) => e => {
+
+    e.preventDefault()
+
+    events
+    .filter(event => event.on === type)
+    .forEach(event => event.actions.forEach(action => {
+      action.payload.push(e.target)
+      dispatch(action.type, action.payload)
+    }))
+}
+
+export const buildEvents = (events, dispatch) => {
+
+  const types = [
+    {attribute: 'onChange', type: 'change'},
+    {attribute: 'onBlur', type: 'blur'},
+    {attribute: 'onClick', type: 'click'},
+  ]
+
+  return types
+    .reduce( (current, next) => {
+      return Object.assign(current, {
+        [next.attribute]: buildEventCallback(events, next.type, dispatch)
+      })
+    }, {})
+}

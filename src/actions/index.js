@@ -88,15 +88,22 @@ export function initArguments(json) {
    }
  }
 
-export function setArgument(from, name, source) {
+export function setArgument(name, element) {
 
-  const value = source[from]
+  let value = ''
 
-  return {
-    type: SET_ARGUMENT,
-    name,
-    value
+  switch(element.nodeName) {
+
+    case 'SELECT':
+    case 'INPUT':
+      value = element.value
+      break
+
+    default:
+      value = ''
   }
+
+  return { type: SET_ARGUMENT, name, value }
 
 }
 
