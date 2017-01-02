@@ -27,7 +27,6 @@ const Element = (node, state, dispatch) => {
    */
   let attributes = Object.assign({key}, eventAttributes)
 
-
   /**
    * Filter out some invalid html attributes
    */
@@ -52,6 +51,10 @@ const Element = (node, state, dispatch) => {
 
       case 'class':
         attributes.className = node[key]
+        break
+
+      case 'for':
+        attributes.htmlFor = node[key]
         break
 
       default:

@@ -88,9 +88,10 @@ export function initArguments(json) {
    }
  }
 
-export function setArgument(name, element) {
+export function setArgument(element) {
 
   let value = ''
+  const name = element.name
 
   switch(element.nodeName) {
 
