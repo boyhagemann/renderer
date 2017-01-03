@@ -20,7 +20,7 @@ const store = createStore(
   )
 );
 
-store.dispatch(fetchStructure('xd60b2f121f16210045c8a4a00849bdc'))
+store.dispatch(fetchStructure('c5f2e43e43dedcf6b5152e921fb04ca2', 'ja9278040a5029a55db8031e0be4ac29'))
 store.dispatch(initLocation())
 
 

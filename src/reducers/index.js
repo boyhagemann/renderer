@@ -5,6 +5,7 @@ import {
   RECEIVE_STRUCTURE,
   FAILED_STRUCTURE,
   CHANGE_LOCATION,
+  REQUEST_DATA,
   RECEIVE_DATA,
   SET_ARGUMENTS,
   SET_ARGUMENT,
@@ -80,8 +81,11 @@ function data(state = {}, action)
 {
   switch(action.type) {
 
+    case REQUEST_DATA:
+      return Object.assign({}, state, {status: 'fetching'})
+
     case RECEIVE_DATA:
-      return Object.assign({}, state, {...action.data})
+      return Object.assign({}, state, {status: 'success', ...action.data})
 
     default:
       return state

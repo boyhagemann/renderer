@@ -35,13 +35,14 @@ const requestStructure = id => ({ type: REQUEST_STRUCTURE, id })
 const failedStructure = (id, code, message) => ({ type: FAILED_STRUCTURE, id, code, message })
 const receiveStructure = (id, json) => ({ type: RECEIVE_STRUCTURE, id, json })
 
-export function fetchStructure(id) {
+export function fetchStructure(id, component) {
 
   return dispatch => {
 
     dispatch(requestStructure(id))
 
     fetch('//api.komparu.dev/v1/test/data/' + id + '/export', {
+    // fetch('//api.komparu.dev/v1/structure/revisions/export/' + component, {
       headers: {
         'Content-type': 'application/json',
         'X-Auth-Token': 'foi3d04mG2354irfV5wSGxlr',
@@ -80,7 +81,7 @@ export function initArguments(json) {
 
    const defaults = json
      .filter( node => node._type === 'Argument')
-     .reduce( (current, next) => ({[next.name]: next.default}), {})
+     .reduce( (current, next) => Object.assign({}, current, {[next.name]: next.default}), {})
 
    return {
      type: SET_ARGUMENTS,
@@ -100,6 +101,10 @@ export function setArgument(element) {
       value = element.value
       break
 
+    case 'LABEL':
+      value = element.for
+      break
+
     default:
       value = ''
   }
@@ -115,7 +120,7 @@ export function setArgument(element) {
  */
 
 export const RECEIVE_DATA = 'RECEIVE_DATA'
-export const QUERY_DATA   = 'QUERY_DATA'
+export const REQUEST_DATA   = 'REQUEST_DATA'
 
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
 import gql from 'graphql-tag'
@@ -123,18 +128,23 @@ const client = new ApolloClient({
   networkInterface: createNetworkInterface({ uri: 'http://api.komparu.dev/graphql' }),
 });
 
+const requestData = () => ({type: REQUEST_DATA})
 const receiveData = data => ({type: RECEIVE_DATA, data})
 
 export function fetchData() {
 
   return (dispatch, getState) => {
 
+      dispatch(requestData())
+
       client.query({
         query: gql`
-          query  ($limit: Int) {
-            products (limit: $limit) {
+          query  ($company: String, $limit: Int) {
+            products (company: $company, limit: $limit) {
               __id
               title
+              company
+              image
             }
           }`,
         variables: getState().query

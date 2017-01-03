@@ -52,6 +52,7 @@ const Node = (id, state = {}, dispatch) => {
       return Section(node, state, dispatch)
 
     case 'Text':
+    case 'TextElement':
       return Text(node, state, dispatch)
 
     case 'Event':
@@ -64,6 +65,7 @@ const Node = (id, state = {}, dispatch) => {
       return Style(node, state, dispatch)
 
     default:
+      console.log(node)
       throw new Error('Component "' + node._type + '" is not implemented')
 
   }
