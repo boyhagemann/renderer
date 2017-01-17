@@ -25,7 +25,7 @@ export function arrayToObject(array, key) {
 export function replace(object, values) {
 
   // Setup the pattern to match
-  const pattern = /"{{[\w\.]+}}"/gi
+  const pattern = /"{{[\w\.|#%-]+}}"/gi
 
   // We transform the object to a plain string, so we can
   // search very efficient and fast
@@ -40,18 +40,35 @@ export function replace(object, values) {
     // Within the matches, we are now only interested in
     // the keyword. With this we can lookup the actual
     // value and replace it.
-    const key = match.match(/[\w\.]+/i)[0]
+    const key = match.match(/[\w\.|#%-]+/i)[0]
 
-    // Extract the actual value from the provided object
-    const value = Immutable
-      .fromJS(values)
-      .getIn(key.split('.'))
 
-    // Always replace the original placeholder
-    const replace = typeof value !== 'undefined' ? value : null
+    const replace = key.split('||').reduce( (current, next) => {
+
+          if(current.replaced) return current
+
+          // Extract the actual value from the provided object
+          const value = Immutable
+            .fromJS(values)
+            .getIn(next.split('.'))
+
+          return typeof value !== 'undefined'
+            ? {
+              replaced: true,
+              value
+            }
+            : {
+              replaced: false,
+              value: next
+            }
+
+    }, {
+      replaced: false,
+      value: null
+    })
 
     // Do the actual replacement
-    return string.replace(match, JSON.stringify(replace))
+    return string.replace(match, JSON.stringify(replace.value))
 
   }, string)
 
@@ -98,4 +115,14 @@ export const buildEvents = (events, dispatch) => {
         [next.attribute]: buildEventCallback(events, next.type, dispatch)
       })
     }, {})
+}
+
+
+export const parseJSON = source => {
+  try {
+      return typeof source === 'string' ? JSON.parse(source) : false
+  }
+  catch(e) {
+    return false
+  }
 }

@@ -8,10 +8,11 @@ import Project from './Project'
 import Context from './Context'
 import Section from './Section'
 import Condition from './Condition'
-import Collection from './Collection'
+import Data from './Data'
 import Event from './Event'
 import Action from './Action'
-import Style from './Style'
+import StyleProperty from './StyleProperty'
+import StyleSheet from './StyleSheet'
 
 const Node = (id, state = {}, dispatch) => {
 
@@ -30,7 +31,7 @@ const Node = (id, state = {}, dispatch) => {
   const raw = state.structure.json[id]
 
   const node = replace(raw, state)
-
+  
   switch(node._type) {
 
     case 'Element':
@@ -42,8 +43,8 @@ const Node = (id, state = {}, dispatch) => {
     case 'Condition':
       return Condition(node, state, dispatch)
 
-    case 'Collection':
-      return Collection(node, state, dispatch)
+    case 'Data':
+      return Data(node, state, dispatch)
 
     case 'Context':
       return Context(node, state, dispatch)
@@ -61,8 +62,11 @@ const Node = (id, state = {}, dispatch) => {
     case 'Action':
       return Action(node, state, dispatch)
 
-    case 'Style':
-      return Style(node, state, dispatch)
+    case 'StyleProperty':
+      return StyleProperty(node, state, dispatch)
+
+    case 'StyleSheet':
+      return StyleSheet(node, state, dispatch)
 
     default:
       console.log(node)

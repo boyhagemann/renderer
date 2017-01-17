@@ -41,8 +41,8 @@ export function fetchStructure(id, component) {
 
     dispatch(requestStructure(id))
 
-    fetch('//api.komparu.dev/v1/test/data/' + id + '/export', {
-    // fetch('//api.komparu.dev/v1/structure/revisions/export/' + component, {
+    // fetch('//api.komparu.dev/v1/test/data/' + id + '/export', {
+    fetch('//api.komparu.dev/v1/structure/revisions/export/' + component, {
       headers: {
         'Content-type': 'application/json',
         'X-Auth-Token': 'foi3d04mG2354irfV5wSGxlr',

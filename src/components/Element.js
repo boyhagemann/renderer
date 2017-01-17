@@ -1,29 +1,22 @@
 import React from 'react'
+import styled from 'styled-components'
 import Node from './Node'
 import { flatten, buildEvents } from '../helpers'
 
 const Element = (node, state, dispatch) => {
 
   // Extract variables from the node
-  const {_id, element, content = []} = node
+  const {_id, element, content = [], styles = []} = node
 
   // Collect the events for this node and map the right
   // acions for these events.
   const events = node.events
     .map(id => Node(id, state, dispatch))
 
-  // Build the style as a simple object, based on the node
-  // information.
-  const styles = flatten(node.styles.map(id => Node(id, state, dispatch)))
-    .reduce( (current, next) => {
-      return Object.assign({}, current, next)
-    }, {})
-
-
   // We must create a unique key for each element that we render.
   // Merge the key given from the Collection item to always have
   // a unique value for the key.
-  const key = _id + state.key
+  const key = _id + '___' + state.key + '___' + Math.random()
 
   // From the collected events, assign each of them to the
   // according trigger (onClick, onChange .e.d.).
@@ -44,16 +37,12 @@ const Element = (node, state, dispatch) => {
       case '_node':
       case 'events':
       case 'element':
+      case 'styles':
         break
 
       // Value cannot be null in React
       case 'value':
         attributes.value = node[key] || ''
-        break
-
-      // We created our own style object earlier
-      case 'styles':
-        attributes.style = styles
         break
 
       // Class becomes className in React
@@ -72,8 +61,16 @@ const Element = (node, state, dispatch) => {
     }
   })
 
+
+  // Build the css for the component
+  const css = flatten(styles.map(id => Node(id, state, dispatch))).join(';')
+
+  // Create the styled component
+  const styledElement = styled[element]`${ css }`
+
+  // Create the React element based on the Styled component
   return React.createElement(
-    element,
+    styledElement,
     attributes,
     content.length
       ? content.map( id => Node(id, state, dispatch) )
