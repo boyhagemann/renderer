@@ -10,22 +10,22 @@ export function arrayToObject(array, key) {
   return array.reduce( (current, next) => {
     return Object.assign({}, current, {[next[key]]: next})
   }, {})
-
-  // let object = {}
-  //
-  // array.map( item => object[item[key]] = item )
-  //
-  // return object
 }
 
 /**
  * Helper method to replace all placeholders in an
  * object with actual values.
  */
+export function replace2(object, values) {
+  // const objectWithStringsReplaced = replacePattern(object, values, /{{[\w\.|#%-]+}}/gi)
+
+  return replace(object, values, /"{{[\w\.|#%-]+}}"/gi)
+}
+
 export function replace(object, values) {
 
   // Setup the pattern to match
-  const pattern = /"{{[\w\.|#%-]+}}"/gi
+  const pattern = /{{[\w\.|#%-]+}}/gi
 
   // We transform the object to a plain string, so we can
   // search very efficient and fast
@@ -42,9 +42,15 @@ export function replace(object, values) {
     // value and replace it.
     const key = match.match(/[\w\.|#%-]+/i)[0]
 
+    // Kind of hack to check if we must replace the whole value
+    // or if we have multiple placeholders in a single string
+    const index = string.match(match).index
+    const replaceAll = string.substr(index - 1, 1) === '"'
 
+    // Handle multiple failover replacements
     const replace = key.split('||').reduce( (current, next) => {
 
+          // Nothing to do if there is value replaced already
           if(current.replaced) return current
 
           // Extract the actual value from the provided object
@@ -52,23 +58,17 @@ export function replace(object, values) {
             .fromJS(values)
             .getIn(next.split('.'))
 
+          // Did we find a replacement?
           return typeof value !== 'undefined'
-            ? {
-              replaced: true,
-              value
-            }
-            : {
-              replaced: false,
-              value: next
-            }
+            ? { replaced: true, value }
+            : { replaced: false, value: next }
 
-    }, {
-      replaced: false,
-      value: null
-    })
+    }, { replaced: false, value: null })
 
     // Do the actual replacement
-    return string.replace(match, JSON.stringify(replace.value))
+    return replaceAll
+      ? string.replace('"' + match + '"', JSON.stringify(replace.value))
+      : string.replace(match, replace.value)
 
   }, string)
 

@@ -20,7 +20,11 @@ const store = createStore(
   )
 );
 
-store.dispatch(fetchStructure('c5f2e43e43dedcf6b5152e921fb04ca2', 'ja9278040a5029a55db8031e0be4ac29'))
+const target = document.querySelector('[data-component]')
+const component = target.dataset.component
+const node = target.dataset.node
+
+store.dispatch(fetchStructure(node, component))
 store.dispatch(initLocation())
 
 
@@ -31,5 +35,5 @@ ReactDOM.render(
   <Provider store={store}>
     <App />
   </Provider>,
-  document.getElementById('root')
+  target
 );

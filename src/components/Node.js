@@ -31,7 +31,7 @@ const Node = (id, state = {}, dispatch) => {
   const raw = state.structure.json[id]
 
   const node = replace(raw, state)
-  
+
   switch(node._type) {
 
     case 'Element':

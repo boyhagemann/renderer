@@ -21,7 +21,7 @@ const Data = (node, state, dispatch) => {
   if(!source) return
 
   const data = parseJSON(source) || source
-
+  
   return flatten(
 
       data instanceof Array
