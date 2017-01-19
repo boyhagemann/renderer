@@ -17,7 +17,7 @@ const Condition = (node, state, dispatch) => {
   // Determine if we need to render the valid or invalid content,
   // based on the outcome of the condition.
   const content = isValid(source, operator, value) ? valid : invalid
-
+  
   // Render the content
   return content.map( id => Node(id, addedState, dispatch) )
 }
